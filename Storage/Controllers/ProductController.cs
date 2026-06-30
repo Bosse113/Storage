@@ -155,7 +155,8 @@ public class ProductController : Controller
                 Price = p.Price,
                 Count = p.Count,
                 InventoryValue = p.Price * p.Count
-            });
+            })
+            .ToList();
 
         return View(products);
     }
