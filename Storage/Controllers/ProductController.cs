@@ -160,5 +160,13 @@ public class ProductController : Controller
 
         return View(products);
     }
+    public IActionResult Search(string category)
+    {
+        var products = _context.Product
+            .Where(p => p.Category == category)
+            .ToList();
+
+        return View("Index", products);
+    }
 
 }
