@@ -1,4 +1,68 @@
-@model IEnumerable<Storage.Models.Product>
+@model Storage.Models.ProductIndexViewModel
+
+@{
+    ViewData["Title"] = "Produkter";
+}
+
+<h1>Lagerlista</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Skapa ny produkt</a>
+</p>
+
+<form asp-controller="Products" asp-action="Index" method="get" class="mb-4">
+    <div class="row g-2 align-items-center">
+
+        <div class="col-auto">
+            <select name="category" asp-items="Model.Categories" class="form-select">
+                <option value="">-- Alla kategorier --</option>
+            </select>
+        </div>
+
+        <div class="col-auto">
+            <input type="text" name="searchString" value="@Model.SearchString" class="form-control" placeholder="Sök på produktnamn..." />
+        </div>
+
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrera</button>
+            <a asp-action="Index" class="btn btn-secondary">Rensa</a>
+        </div>
+
+    </div>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Namn</th>
+            <th>Pris</th>
+            <th>Kategori</th>
+            <th>Hylla</th>
+            <th>Lagersaldo</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                <td>@Html.DisplayFor(modelItem => item.Price) kr</td>
+                <td>@Html.DisplayFor(modelItem => item.Category)</td>
+                <td>@Html.DisplayFor(modelItem => item.Shelf)</td>
+                <td>@Html.DisplayFor(modelItem => item.Count) st</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Ändra</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Detaljer</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">Ta bort</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@* @model IEnumerable<Storage.Models.Product>
 
 @{
     ViewData["Title"] = "Index";
@@ -85,3 +149,4 @@
 }
     </tbody>
 </table>
+ *@

@@ -1,5 +1,5 @@
-
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Storage.Models;
 
@@ -13,11 +13,55 @@ public class ProductController : Controller
     }
 
     // GET: PRODUCTS
-    public async Task<IActionResult> Index()    
+    //public async Task<IActionResult> Index()    
+    //{
+    //    return View(await _context.Product.ToListAsync());
+    //}
+    // GET: Products
+    public async Task<IActionResult> Index(string searchString, string category)
     {
-        return View(await _context.Product.ToListAsync());
-    }
+        // 1. Hämta alla unika kategorier från databasen för att fylla dropdown-menyn
+        var categoryQuery = from p in _context.Product
+                            orderby p.Category
+                            select p.Category;
 
+        var uniqueCategories = await categoryQuery.Distinct().ToListAsync();
+
+        // 2. Skapa grund-queryn för produkterna
+        var productsQuery = from p in _context.Product
+                            select p;
+
+        // 3. Filtrera på produktnamn (om fritextfältet används)
+        if (!string.IsNullOrEmpty(searchString))
+        {
+            productsQuery = productsQuery.Where(s => s.Name.Contains(searchString));
+        }
+
+        // 4. Filtrera på kategori (om dropdown-menyn används)
+        if (!string.IsNullOrEmpty(category))
+        {
+            productsQuery = productsQuery.Where(x => x.Category == category);
+        }
+
+        // 5. Bygg ihop vår ViewModel
+        var viewModel = new ProductIndexViewModel
+        {
+            Products = await productsQuery.ToListAsync(),
+
+            // Mappa de unika strängarna till SelectListItem för dropdownen
+            Categories = uniqueCategories.Select(c => new SelectListItem
+            {
+                Value = c,
+                Text = c,
+                Selected = c == category // Markera den valda kategorin som aktiv
+            }),
+
+            SearchString = searchString,
+            SelectedCategory = category
+        };
+
+        return View(viewModel);
+    }
     // GET: PRODUCTS/Details/5
     public async Task<IActionResult> Details(int? id)
     {
